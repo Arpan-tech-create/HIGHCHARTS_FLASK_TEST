@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pie Chart</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div>
+        From: <input type="date" id="from-date">
+        To: <input type="date" id="to-date">
+        <button onclick="updateChart()">Update Chart</button>
+    </div>
+    <div id="container"></div>
+
+    <script>
+        var pieData = {{ pie_data|tojson }};
+        var from_date = "{{ from_date }}";
+        var to_date = "{{ to_date }}";
+
+        function updateChart() {
+            var fromDate = document.getElementById('from-date').value;
+            var toDate = document.getElementById('to-date').value;
+
+            // Update the URL with the selected date range
+            var url = window.location.href.split('?')[0] + '?from-date=' + fromDate + '&to-date=' + toDate;
+
+            // Redirect to the updated URL
+            window.location.href = url;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create the chart
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Message Counts'
+                },
+                series: [{
+                    name: 'Count',
+                    data: pieData
+                }]
+            });
+
+            // Set the selected date range in the date inputs
+            document.getElementById('from-date').value = from_date;
+            document.getElementById('to-date').value = to_date;
+        });
+    </script>
+</body>
+</html>

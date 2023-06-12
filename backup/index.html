@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Date-wise Counts</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div>
+        From: <input type="date" id="from-date">
+        To: <input type="date" id="to-date">
+        <button onclick="updateChart()">Update Chart</button>
+    </div>
+    <div id="container"></div>
+    <div id="hourly-chart"></div>
+
+    <script>
+        var originalData = {{ original_data|tojson }};
+        var hourlyData = {{ hourly_data|tojson }};
+
+        function createHourlyChart(selectedDate) {
+            // Filter the hourly data for the selected date
+            var hourlySeriesData = hourlyData.filter(function(item) {
+                return item.Date === selectedDate;
+            }).map(function(item) {
+                return {
+                    name: item.Hour,
+                    y: 1
+                };
+            });
+
+            // Create the hourly chart
+            Highcharts.chart('hourly-chart', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Hourly Counts for ' + selectedDate
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Count'
+                    }
+                },
+                series: [{
+                    name: 'Count',
+                    data: hourlySeriesData
+                }]
+            });
+        }
+
+        function updateChart() {
+            var fromDate = document.getElementById('from-date').value;
+            var toDate = document.getElementById('to-date').value;
+
+            // Filter the original data based on the selected date range
+            var filteredData = originalData.filter(function(item) {
+                return item.name >= fromDate && item.name <= toDate;
+            });
+
+            // Create the updated chart
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Date-wise Counts'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Count'
+                    }
+                },
+                series: [{
+                    name: 'Count',
+                    data: filteredData,
+                    events: {
+                        click: function(event) {
+                            var selectedDate = event.point.name;
+                            createHourlyChart(selectedDate);
+                        }
+                    }
+                }]
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create the initial chart
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Date-wise Counts'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Count'
+                    }
+                },
+                series: [{
+                    name: 'Count',
+                    data: originalData,
+                    events: {
+                        click: function(event) {
+                            var selectedDate = event.point.name;
+                            createHourlyChart(selectedDate);
+                        }
+                    }
+                }]
+            });
+        });
+    </script>
+</body>
+</html>
