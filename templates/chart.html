@@ -22,42 +22,48 @@
         var to_date = "{{ to_date }}";
 
         function createHourlyChart(selectedDate) {
-            // Retrieve the hourly data for the selected date
-            var selectedHourlyData = hourlyData[selectedDate];
+    // Retrieve the hourly data for the selected date
+    var selectedHourlyData = hourlyData[selectedDate];
 
-            // Prepare the data for Highcharts
-            var seriesData = selectedHourlyData.map(function(item) {
-                return {
-                    name: item[0], // Hour
-                    y: item[1]     // Count
-                };
-            });
+    // Prepare the data for Highcharts
+    var seriesData = [];
+    for (var i = 0; i < 24; i++) {
+        var hourData = selectedHourlyData.find(function(item) {
+            return parseInt(item[0]) === i;
+        });
+        var count = hourData ? hourData[1] : 0;
+        seriesData.push({
+            name: i.toString(), // Hour
+            y: count // Count
+        });
+    }
 
-            // Create the hourly chart
-            Highcharts.chart('hourly-chart', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Hourly Counts for ' + selectedDate
-                },
-                xAxis: {
-                    type: 'category',
-                    categories: selectedHourlyData.map(function(item) {
-                        return item[0]; // Hour
-                    })
-                },
-                yAxis: {
-                    title: {
-                        text: 'Count'
-                    }
-                },
-                series: [{
-                    name: 'Count',
-                    data: seriesData
-                }]
-            });
-        }
+    // Create the hourly chart
+    Highcharts.chart('hourly-chart', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Hourly Counts for ' + selectedDate
+        },
+        xAxis: {
+            type: 'category',
+            categories: Array.from(Array(24).keys()).map(function(hour) {
+                return hour.toString(); // Hour
+            })
+        },
+        yAxis: {
+            title: {
+                text: 'Count'
+            }
+        },
+        series: [{
+            name: 'Count',
+            data: seriesData
+        }]
+    });
+}
+
 
         function updateChart() {
             var fromDate = document.getElementById('from-date').value;
